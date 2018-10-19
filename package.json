@@ -1,0 +1,28 @@
+{
+  "name": "http-lab",
+  "version": "1.0.0",
+  "description": "A lab project for COMP 445.",
+  "scripts": {
+    "test": "test",
+    "build": "tsc"
+  },
+  "bin": {
+    "httpc": "./build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "null"
+  },
+  "keywords": [
+    "null"
+  ],
+  "author": "Mathieu Lajoie",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.9.4",
+    "typescript": "^3.0.3"
+  }
+}
