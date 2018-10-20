@@ -1,5 +1,5 @@
 {
-  "name": "http-lab",
+  "name": "http-server",
   "version": "1.0.0",
   "description": "A lab project for COMP 445.",
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "tsc"
   },
   "bin": {
-    "httpc": "./build/index.js"
+    "httpfs": "./build/index.js"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,3 @@
+this is a test file
+its output is a txt file
+and there is some stuff in here woo
