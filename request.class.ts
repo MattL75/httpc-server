@@ -5,15 +5,15 @@ export class RequestClass {
     public method: string;
     public hostStr: URL;
     public version: string;
-    public headers: Header[];
+    public headers = {};
 
     constructor(request: string) {
 
         // Get all lines of the request
         const lines = request.split('\r\n');
 
-        // Remove the last line, which is just \r\n
-        lines.pop();
+        // Remove the last two line, which are just \r\n
+        lines.pop(); lines.pop();
 
         // Extract the request line
         const requestLine = lines[0].split(' ');
@@ -25,19 +25,30 @@ export class RequestClass {
         lines.shift();
         lines.forEach(line => {
             const temp = line.split(":");
-            this.headers.push(new Header(temp[0].trim(), temp[1].trim()));
+            this.headers[temp[0].trim().toLocaleLowerCase()] = temp[1].trim().toLocaleLowerCase();
         });
+
+        // Add the date header
+        this.headers["date"] = new Date().toUTCString();
     }
 
     public headersToString(): string {
         let str = "";
-        this.headers.forEach(header => {
-            str += header.name + ": " + header.value + "\r\n";
+
+        // Get all object keys
+        Object.keys(this.headers).forEach(header => {
+            str += this.capitalize(header) + ": " + this.headers[header] + "\r\n";
         });
         return str + "\r\n";
     }
-}
 
-class Header {
-    constructor(public name: string, public value: string) {}
+    private capitalize(str: string): string {
+        str = str.charAt(0).toLocaleUpperCase() + str.slice(1).toLocaleLowerCase();
+        for (let i = 0; i < str.length; ++i) {
+            if (str.charAt(i - 1) === '-') {
+                str = str.slice(0, i) + str.charAt(i).toLocaleUpperCase() + str.slice(i + 1);
+            }
+        }
+        return str;
+    }
 }

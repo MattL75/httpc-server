@@ -31,7 +31,7 @@ program
     .option('-d, --directory <directory>', 'Port number')
     .action(function (host, options) {
         const debug = program.rawArgs.includes('-v');
-        http.start(host.port, host.directory, debug);
+        http.start(host.directory, host.port, debug);
     });
 
 program.parse(process.argv);
