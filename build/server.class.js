@@ -69,6 +69,7 @@ var HttpServer = /** @class */ (function () {
             }
             this.write(this.result(req, 400), conn);
         }
+        // Identify request type
         if (req.method === "get") {
             if (this.debug)
                 console.log('Request type is GET.');
@@ -94,9 +95,9 @@ var HttpServer = /** @class */ (function () {
         if (req.hostStr.pathname === "/") {
             if (this.debug)
                 console.log('Request is for DIRECTORY-CONTENT.\n');
+            // Get all files in directory
             var str_1 = "";
             fs.readdir(path, function (err, items) {
-                console.log(items);
                 // Check if empty
                 if (items.length === 0) {
                     _this.write(_this.result(req, 200, "Directory is empty."), conn);
@@ -130,11 +131,32 @@ var HttpServer = /** @class */ (function () {
             fs.readFile(path, function (err, data) {
                 if (err)
                     throw err;
-                if (ext_1 === 'json') {
-                    req.headers['content-type'] = 'application/json';
-                }
-                else if (ext_1 === 'txt') {
-                    req.headers['content-type'] = 'text/plain';
+                // Assign content-type
+                switch (ext_1) {
+                    case 'json':
+                        req.headers['content-type'] = 'application/json';
+                        break;
+                    case 'js':
+                        req.headers['content-type'] = 'application/javascript';
+                        break;
+                    case 'ts':
+                        req.headers['content-type'] = 'application/javascript';
+                        break;
+                    case 'xml':
+                        req.headers['content-type'] = 'application/xml';
+                        break;
+                    case 'txt':
+                        req.headers['content-type'] = 'text/plain';
+                        break;
+                    case 'html':
+                        req.headers['content-type'] = 'text/html';
+                        break;
+                    case 'css':
+                        req.headers['content-type'] = 'text/css';
+                        break;
+                    case 'csv':
+                        req.headers['content-type'] = 'text/csv';
+                        break;
                 }
                 req.headers['content-disposition'] = 'inline';
                 _this.write(_this.result(req, 200, data), conn);
@@ -142,10 +164,26 @@ var HttpServer = /** @class */ (function () {
         }
     };
     HttpServer.prototype.post = function (req, conn) {
-        return "";
+        var _this = this;
+        var path = this.directoryPath + req.hostStr.pathname;
+        // Extract extension
+        var ext = path.split('.')[1];
+        // Return error if no extension
+        if (!ext) {
+            this.write(this.result(req, 404), conn);
+        }
+        // Get contents
+        fs.writeFile(path, req.data, function (err) {
+            if (err)
+                throw err;
+            _this.write(_this.result(req, 200), conn);
+        });
     };
     HttpServer.prototype.result = function (request, code, data) {
         if (code === void 0) { code = 200; }
+        if (!data) {
+            data = JSON.stringify({ data: request.data, headers: request.headers }, null, "    ");
+        }
         // Extract code message
         var codeMsg;
         switch (code) {
@@ -166,11 +204,6 @@ var HttpServer = /** @class */ (function () {
         var result = "HTTP/1.0 " + code + " " + codeMsg + "\r\n" + (request != null && request != undefined ? request.headersToString() : '');
         if (data) {
             return result + data + "\r\n\r\n";
-        }
-        if (this.debug) {
-            console.log();
-            console.log("Sending response... ");
-            console.log(result);
         }
         return result;
     };

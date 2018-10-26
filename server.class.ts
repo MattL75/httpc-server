@@ -74,6 +74,7 @@ export class HttpServer {
             this.write(this.result(req, 400), conn);
         }
 
+        // Identify request type
         if (req.method === "get") {
             if (this.debug) console.log('Request type is GET.');
             this.get(req, conn);
@@ -93,6 +94,8 @@ export class HttpServer {
         // List directory
         if (req.hostStr.pathname === "/") {
             if (this.debug) console.log('Request is for DIRECTORY-CONTENT.\n');
+
+            // Get all files in directory
             let str = "";
             fs.readdir(path, (err, items) => {
 
@@ -128,13 +131,37 @@ export class HttpServer {
             if (!ext) {
                 this.write(this.result(req, 400), conn);
             }
+
             // Get contents
             fs.readFile(path, (err, data) => {
                 if (err) throw err;
-                if (ext === 'json') {
-                    req.headers['content-type'] = 'application/json';
-                } else if (ext === 'txt') {
-                    req.headers['content-type'] = 'text/plain';
+
+                // Assign content-type
+                switch (ext) {
+                    case 'json':
+                        req.headers['content-type'] = 'application/json';
+                        break;
+                    case 'js':
+                        req.headers['content-type'] = 'application/javascript';
+                        break;
+                    case 'ts':
+                        req.headers['content-type'] = 'application/javascript';
+                        break;
+                    case 'xml':
+                        req.headers['content-type'] = 'application/xml';
+                        break;
+                    case 'txt':
+                        req.headers['content-type'] = 'text/plain';
+                        break;
+                    case 'html':
+                        req.headers['content-type'] = 'text/html';
+                        break;
+                    case 'css':
+                        req.headers['content-type'] = 'text/css';
+                        break;
+                    case 'csv':
+                        req.headers['content-type'] = 'text/csv';
+                        break;
                 }
                 req.headers['content-disposition'] = 'inline';
 
@@ -143,11 +170,29 @@ export class HttpServer {
         }
     }
 
-    private post(req: RequestClass, conn: any): string {
-        return "";
+    private post(req: RequestClass, conn: any): void {
+        const path = this.directoryPath + req.hostStr.pathname;
+
+        // Extract extension
+        const ext = path.split('.')[1];
+
+        // Return error if no extension
+        if (!ext) {
+            this.write(this.result(req, 404), conn);
+        }
+
+        // Get contents
+        fs.writeFile(path, req.data, err => {
+            if (err) throw err;
+            this.write(this.result(req, 200), conn);
+        });
     }
 
-    private result(request: RequestClass, code: number = 200, data?: string): string {
+    private result(request: RequestClass, code: number = 200, data?: any): string {
+
+        if (!data) {
+            data = JSON.stringify({data: request.data, headers: request.headers}, null, "    ");
+        }
 
         // Extract code message
         let codeMsg: string;
@@ -171,11 +216,7 @@ export class HttpServer {
         if (data) {
             return result + data + "\r\n\r\n";
         }
-        if (this.debug) {
-            console.log();
-            console.log("Sending response... ");
-            console.log(result);
-        }
+
         return result;
     }
 

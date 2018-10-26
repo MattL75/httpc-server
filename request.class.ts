@@ -6,20 +6,28 @@ export class RequestClass {
     public hostStr: URL;
     public version: string;
     public headers = {};
+    public data: string;
 
     constructor(request: string) {
 
         // Get all lines of the request
-        const lines = request.split('\r\n');
-
-        // Remove the last two line, which are just \r\n
-        lines.pop(); lines.pop();
+        let lines = request.split('\r\n');
 
         // Extract the request line
         const requestLine = lines[0].split(' ');
         this.method = requestLine[0].toLocaleLowerCase();
         this.hostStr = new URL(requestLine[1]);
         this.version = requestLine[2];
+
+        // Remove the last two line, which are just \r\n
+        if (this.method == 'get') {
+            lines.pop();
+            lines.pop();
+        } else {
+            let tempArray = request.split('\r\n\r\n');
+            this.data = tempArray[1] ? tempArray[1] : '';
+            lines = tempArray[0].split('\r\n');
+        }
 
         // Extract the headers
         lines.shift();

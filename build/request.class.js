@@ -7,14 +7,21 @@ var RequestClass = /** @class */ (function () {
         this.headers = {};
         // Get all lines of the request
         var lines = request.split('\r\n');
-        // Remove the last two line, which are just \r\n
-        lines.pop();
-        lines.pop();
         // Extract the request line
         var requestLine = lines[0].split(' ');
         this.method = requestLine[0].toLocaleLowerCase();
         this.hostStr = new URL(requestLine[1]);
         this.version = requestLine[2];
+        // Remove the last two line, which are just \r\n
+        if (this.method == 'get') {
+            lines.pop();
+            lines.pop();
+        }
+        else {
+            var tempArray = request.split('\r\n\r\n');
+            this.data = tempArray[1] ? tempArray[1] : '';
+            lines = tempArray[0].split('\r\n');
+        }
         // Extract the headers
         lines.shift();
         lines.forEach(function (line) {
