@@ -134,7 +134,9 @@ export class HttpServer {
 
             // Get contents
             fs.readFile(path, (err, data) => {
-                if (err) throw err;
+                if (err) {
+                    this.write(this.result(req, 404), conn);
+                }
 
                 // Assign content-type
                 switch (ext) {
@@ -183,7 +185,10 @@ export class HttpServer {
 
         // Get contents
         fs.writeFile(path, req.data, err => {
-            if (err) throw err;
+            if (err) {
+                this.write(this.result(req, 404), conn);
+            }
+
             this.write(this.result(req, 200), conn);
         });
     }
@@ -191,7 +196,7 @@ export class HttpServer {
     private result(request: RequestClass, code: number = 200, data?: any): string {
 
         if (!data) {
-            data = JSON.stringify({data: request.data, headers: request.headers}, null, "    ");
+            data = JSON.stringify({data: (request.headers['content-type'] == 'application/json' ? JSON.parse(request.data) : request.data), headers: request.headers}, null, "   ");
         }
 
         // Extract code message
