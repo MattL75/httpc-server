@@ -130,12 +130,14 @@ export class HttpServer {
             // Return error if no extension
             if (!ext) {
                 this.write(this.result(req, 400), conn);
+                return;
             }
 
             // Get contents
             fs.readFile(path, (err, data) => {
                 if (err) {
                     this.write(this.result(req, 404), conn);
+                    return;
                 }
 
                 // Assign content-type
@@ -181,12 +183,14 @@ export class HttpServer {
         // Return error if no extension
         if (!ext) {
             this.write(this.result(req, 404), conn);
+            return;
         }
 
         // Get contents
         fs.writeFile(path, req.data, err => {
             if (err) {
                 this.write(this.result(req, 404), conn);
+                return;
             }
 
             this.write(this.result(req, 200), conn);
@@ -196,7 +200,7 @@ export class HttpServer {
     private result(request: RequestClass, code: number = 200, data?: any): string {
 
         if (!data) {
-            data = JSON.stringify({data: (request.headers['content-type'] == 'application/json' ? JSON.parse(request.data) : request.data), headers: request.headers}, null, "   ");
+            data = JSON.stringify({data: (request.headers['content-type'] === 'application/json' ? (request.data ? JSON.parse(request.data) : "") : (request.data ? request.data : "")), headers: request.headers}, null, "   ");
         }
 
         // Extract code message

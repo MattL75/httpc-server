@@ -126,11 +126,13 @@ var HttpServer = /** @class */ (function () {
             // Return error if no extension
             if (!ext_1) {
                 this.write(this.result(req, 400), conn);
+                return;
             }
             // Get contents
             fs.readFile(path, function (err, data) {
                 if (err) {
                     _this.write(_this.result(req, 404), conn);
+                    return;
                 }
                 // Assign content-type
                 switch (ext_1) {
@@ -172,11 +174,13 @@ var HttpServer = /** @class */ (function () {
         // Return error if no extension
         if (!ext) {
             this.write(this.result(req, 404), conn);
+            return;
         }
         // Get contents
         fs.writeFile(path, req.data, function (err) {
             if (err) {
                 _this.write(_this.result(req, 404), conn);
+                return;
             }
             _this.write(_this.result(req, 200), conn);
         });
@@ -184,7 +188,7 @@ var HttpServer = /** @class */ (function () {
     HttpServer.prototype.result = function (request, code, data) {
         if (code === void 0) { code = 200; }
         if (!data) {
-            data = JSON.stringify({ data: (request.headers['content-type'] == 'application/json' ? JSON.parse(request.data) : request.data), headers: request.headers }, null, "   ");
+            data = JSON.stringify({ data: (request.headers['content-type'] === 'application/json' ? (request.data ? JSON.parse(request.data) : "") : (request.data ? request.data : "")), headers: request.headers }, null, "   ");
         }
         // Extract code message
         var codeMsg;
