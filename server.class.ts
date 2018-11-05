@@ -9,7 +9,7 @@ export class HttpServer {
     public directoryPath;
     public debug;
 
-    public start(path: string = '/server', port: number = 8080, debug: boolean = false): void {
+    public start(path: string = 'server', port: number = 8080, debug: boolean = false): void {
 
         // Constructor methods
         this.port = port;

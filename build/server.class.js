@@ -8,7 +8,7 @@ var HttpServer = /** @class */ (function () {
     }
     HttpServer.prototype.start = function (path, port, debug) {
         var _this = this;
-        if (path === void 0) { path = '/server'; }
+        if (path === void 0) { path = 'server'; }
         if (port === void 0) { port = 8080; }
         if (debug === void 0) { debug = false; }
         // Constructor methods

@@ -44,6 +44,8 @@ If one or two consecutive dots are encountered in the path, they are ignored and
 
 `httpc get http://localhost:8080/.././ -v`
 
+`httpc get http://localhost:8080/security-test/ -v`
+
 #### Error Handling Showcase
 
 The example below demonstrates how the server will handle requests for files that do not exist. It will simply divert to a 404 Not Found response, allowing the user to change their request if they so choose.
